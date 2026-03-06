@@ -1,5 +1,5 @@
-
-const apiKey = "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";
+require('dotenv').config();
+const apiKey = process.env.OPENROUTER_API_KEY;
 const MODELS = [
     "mistralai/mistral-small-3.1-24b-instruct:free",
     "meta-llama/llama-3.3-70b-instruct:free",
