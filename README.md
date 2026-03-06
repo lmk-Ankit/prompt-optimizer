@@ -8,6 +8,7 @@
 ![License](https://img.shields.io/badge/license-MIT-f59e0b?style=flat-square)
 
 ---
+<img width="1642" height="1322" alt="image" src="https://github.com/user-attachments/assets/ede2b0a4-a1a2-412a-b92d-6a475c75d048" />
 
 ## What it does
 
@@ -69,9 +70,7 @@ prompt-optimizer/
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/lmk-Ankit<img width="1630" height="1327" alt="image" src="https://github.com/user-attachments/assets/3d86076d-9881-4571-bc46-e7e0172e78a9" />
-<img width="1642" height="1322" alt="image" src="https://github.com/user-attachments/assets/ede2b0a4-a1a2-412a-b92d-6a475c75d048" />
-/prompt-optimizer.git
+git clone https://github.com/lmk-Ankit/prompt-optimizer.git
 cd prompt-optimizer
 ```
 
@@ -135,6 +134,7 @@ Run it locally in VS Code with the Jupyter extension.
 - [ ] Batch optimization (multiple prompts at once)
 
 ---
+<img width="1630" height="1327" alt="image" src="https://github.com/user-attachments/assets/3d86076d-9881-4571-bc46-e7e0172e78a9" />
 
 ## License
 
@@ -145,3 +145,4 @@ MIT — free to use, modify, and deploy.
 <div align="center">
   <sub>Built with OpenRouter · Deployed on Vercel</sub>
 </div>
+
