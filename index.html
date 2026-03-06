@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Optimizer — AI-Powered Prompt Enhancement</title>
+  <meta name="description" content="Transform weak, vague prompts into powerful, structured instructions using AI. Free, instant, no sign-up required." />
+
+  <!-- Google Font — Inter for a clean, modern feel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Design Tokens ──────────────────────────────────────── */
+    :root {
+      --bg:          #0b0f1a;
+      --surface:     #111827;
+      --surface-2:   #1f2937;
+      --border:      #2a3347;
+      --text:        #e5e7eb;
+      --text-dim:    #9ca3af;
+      --accent:      #6366f1;         /* indigo-500 */
+      --accent-glow: rgba(99,102,241,.35);
+      --green:       #22c55e;
+      --red:         #ef4444;
+      --orange:      #f59e0b;
+      --radius:      14px;
+      --glass:       rgba(17,24,39,.55);
+    }
+
+    /* ─── Reset & Base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated gradient mesh background */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(99,102,241,.12), transparent),
+        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(139,92,246,.10), transparent),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(59,130,246,.06), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────── */
+    .app {
+      position: relative; z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem;
+    }
+
+    /* ─── Header ─────────────────────────────────────────────── */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .header__logo {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #6366f1, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.03em;
+    }
+    .header__sub {
+      color: var(--text-dim);
+      font-size: 1rem;
+      margin-top: .35rem;
+    }
+    /* Live status dot */
+    .status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 6px;
+      animation: pulse-dot 2s ease-in-out infinite;
+      vertical-align: middle;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,.5); }
+      50%      { opacity: .7; box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+    .status-label {
+      font-size: .8rem;
+      color: var(--text-dim);
+      vertical-align: middle;
+    }
+
+    /* ─── Card (shared glass panel) ──────────────────────────── */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(18px) saturate(1.3);
+      -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      transition: border-color .3s;
+    }
+    .card:hover { border-color: rgba(99,102,241,.35); }
+
+    .card__title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .card__icon {
+      font-size: 1.2rem;
+    }
+
+    /* ─── Textarea ───────────────────────────────────────────── */
+    #prompt-input {
+      width: 100%;
+      min-height: 120px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .95rem;
+      resize: vertical;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    #prompt-input::placeholder { color: var(--text-dim); }
+    #prompt-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* ─── Mode Selector ──────────────────────────────────────── */
+    .modes {
+      display: flex;
+      gap: .5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .mode-btn {
+      flex: 1;
+      min-width: 130px;
+      padding: .65rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-dim);
+      font-family: inherit;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center;
+    }
+    .mode-btn:hover { border-color: var(--accent); color: var(--text); }
+    .mode-btn.active {
+      background: rgba(99,102,241,.15);
+      border-color: var(--accent);
+      color: #a5b4fc;
+    }
+
+    /* ─── Optimize Button ────────────────────────────────────── */
+    #optimize-btn {
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: .9rem;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      box-shadow: 0 4px 24px var(--accent-glow);
+      transition: transform .15s, box-shadow .15s;
+    }
+    #optimize-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+    #optimize-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* ─── Loader Spinner ─────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Output Panel ───────────────────────────────────────── */
+    #output-card { display: none; }
+    #output-card.visible { display: block; animation: fadeUp .4s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #improved-text {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      font-size: .93rem;
+      line-height: 1.65;
+      color: var(--text);
+      white-space: pre-wrap;
+      min-height: 60px;
+    }
+    .cursor-blink::after {
+      content: '▌';
+      animation: blink 1s step-end infinite;
+      color: var(--accent);
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ─── Copy Button ────────────────────────────────────────── */
+    #copy-btn {
+      margin-top: .75rem;
+      padding: .55rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text-dim);
+      font-family: inherit;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    #copy-btn:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ─── Score Bars ─────────────────────────────────────────── */
+    .scores { margin-top: 1rem; }
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: .7rem;
+    }
+    .score-label {
+      width: 70px;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+    .score-track {
+      flex: 1;
+      height: 10px;
+      background: var(--surface);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .score-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width .8s cubic-bezier(.22,1,.36,1);
+    }
+    .score-fill.before { background: linear-gradient(90deg, var(--red), var(--orange)); }
+    .score-fill.after  { background: linear-gradient(90deg, #22c55e, #4ade80); }
+    .score-value {
+      width: 42px;
+      text-align: right;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+
+    /* ─── Issues List ────────────────────────────────────────── */
+    .issues-list {
+      list-style: none;
+      margin-top: .75rem;
+    }
+    .issues-list li {
+      font-size: .82rem;
+      color: var(--orange);
+      padding: .3rem 0;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .issues-list li::before {
+      content: '⚡';
+      position: absolute;
+      left: 0;
+    }
+
+    /* ─── Error Toast ────────────────────────────────────────── */
+    #error-toast {
+      display: none;
+      margin-top: 1rem;
+      padding: .85rem 1rem;
+      border-radius: 10px;
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.3);
+      color: #fca5a5;
+      font-size: .85rem;
+    }
+    #error-toast.visible { display: block; animation: fadeUp .3s ease; }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: var(--text-dim);
+      font-size: .78rem;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .app { padding: 1.25rem 1rem; }
+      .header__logo { font-size: 1.8rem; }
+      .modes { flex-direction: column; }
+      .mode-btn { min-width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <header class="header">
+      <h1 class="header__logo">✦ Prompt Optimizer</h1>
+      <p class="header__sub">Transform vague prompts into powerful, structured instructions</p>
+      <div style="margin-top:.6rem">
+        <span class="status-dot"></span>
+        <span class="status-label">API Online</span>
+      </div>
+    </header>
+
+    <!-- ── Input Card ──────────────────────────────────────── -->
+    <section class="card">
+      <div class="card__title"><span class="card__icon">✍️</span> Your Prompt</div>
+      <textarea id="prompt-input" placeholder="Type a weak prompt… e.g. &quot;explain ai&quot;"></textarea>
+
+      <!-- Mode selector -->
+      <div class="modes">
+        <button class="mode-btn active" data-mode="quick" id="mode-quick">⚡ Quick Fix</button>
+        <button class="mode-btn" data-mode="deep" id="mode-deep">🔍 Deep Elaborate</button>
+        <button class="mode-btn" data-mode="research" id="mode-research">📚 Research Style</button>
+      </div>
+
+      <button id="optimize-btn">Optimize Prompt</button>
+    </section>
+
+    <!-- ── Error Toast ─────────────────────────────────────── -->
+    <div id="error-toast"></div>
+
+    <!-- ── Output Card (hidden until result) ───────────────── -->
+    <section class="card" id="output-card">
+      <div class="card__title"><span class="card__icon">🚀</span> Optimized Prompt</div>
+      <div id="improved-text"></div>
+      <button id="copy-btn">📋 Copy to Clipboard</button>
+
+      <!-- Score comparison bars -->
+      <div class="scores">
+        <div class="score-row">
+          <span class="score-label">Before</span>
+          <div class="score-track"><div class="score-fill before" id="bar-before" style="width:0%"></div></div>
+          <span class="score-value" id="val-before">0</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">After</span>
+          <div class="score-track"><div class="score-fill after" id="bar-after" style="width:0%"></div></div>
+          <span class="score-value" id="val-after">0</span>
+        </div>
+      </div>
+
+      <!-- Issues found in original prompt -->
+      <ul class="issues-list" id="issues-list"></ul>
+    </section>
+
+    <footer class="footer">
+      Built with OpenRouter &amp; Vercel &middot; <a href="https://github.com/lmk-Ankit/prompt-optimizer" target="_blank">GitHub</a>
+    </footer>
+  </div>
+
+  <script>
+    // ─── DOM Refs ───────────────────────────────────────────────
+    const input      = document.getElementById('prompt-input');
+    const btn        = document.getElementById('optimize-btn');
+    const outputCard = document.getElementById('output-card');
+    const outputText = document.getElementById('improved-text');
+    const copyBtn    = document.getElementById('copy-btn');
+    const barBefore  = document.getElementById('bar-before');
+    const barAfter   = document.getElementById('bar-after');
+    const valBefore  = document.getElementById('val-before');
+    const valAfter   = document.getElementById('val-after');
+    const issuesList = document.getElementById('issues-list');
+    const errorToast = document.getElementById('error-toast');
+    const modeButtons = document.querySelectorAll('.mode-btn');
+
+    let selectedMode = 'quick'; // default mode
+
+    // ─── Mode Selector ─────────────────────────────────────────
+    modeButtons.forEach(b => {
+      b.addEventListener('click', () => {
+        modeButtons.forEach(m => m.classList.remove('active'));
+        b.classList.add('active');
+        selectedMode = b.dataset.mode;
+      });
+    });
+
+    // ─── Typewriter Effect ──────────────────────────────────────
+    // Renders text character-by-character into an element for a polished feel.
+    function typewriter(element, text, speed = 12) {
+      return new Promise(resolve => {
+        element.textContent = '';
+        element.classList.add('cursor-blink');
+        let i = 0;
+        const interval = setInterval(() => {
+          element.textContent += text[i];
+          i++;
+          if (i >= text.length) {
+            clearInterval(interval);
+            element.classList.remove('cursor-blink');
+            resolve();
+          }
+        }, speed);
+      });
+    }
+
+    // ─── Main Optimize Handler ──────────────────────────────────
+    btn.addEventListener('click', async () => {
+      const prompt = input.value.trim();
+      if (!prompt) { input.focus(); return; }
+
+      // UI → loading state
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Optimizing…';
+      outputCard.classList.remove('visible');
+      errorToast.classList.remove('visible');
+
+      try {
+        const res = await fetch('/api/optimize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, mode: selectedMode }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Server error' }));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // Animate output card in
+        outputCard.classList.add('visible');
+
+        // Typewriter animation for the improved prompt
+        await typewriter(outputText, data.improved);
+
+        // Animate score bars (0–10 scale → 0–100% width)
+        barBefore.style.width = `${(data.score_before / 10) * 100}%`;
+        barAfter.style.width  = `${(data.score_after / 10) * 100}%`;
+        valBefore.textContent = `${data.score_before}/10`;
+        valAfter.textContent  = `${data.score_after}/10`;
+
+        // Render issues list
+        issuesList.innerHTML = '';
+        (data.issues || []).forEach(issue => {
+          const li = document.createElement('li');
+          li.textContent = issue;
+          issuesList.appendChild(li);
+        });
+
+      } catch (err) {
+        errorToast.textContent = `⚠ ${err.message}`;
+        errorToast.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Optimize Prompt';
+      }
+    });
+
+    // ─── Copy to Clipboard ──────────────────────────────────────
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(outputText.textContent).then(() => {
+        copyBtn.textContent = '✅ Copied!';
+        setTimeout(() => { copyBtn.textContent = '📋 Copy to Clipboard'; }, 2000);
+      });
+    });
+
+    // ─── Keyboard Shortcut (Ctrl+Enter to optimize) ────────────
+    input.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') btn.click();
+    });
+  </script>
+</body>
+</html>

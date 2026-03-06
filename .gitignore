@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment variables (never commit real keys)
+.env
+
+# Notebook outputs & checkpoints
+.ipynb_checkpoints/
+results.csv
+report.csv
+__pycache__/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel/

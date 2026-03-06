@@ -1,0 +1,26 @@
+{
+    "name": "prompt-optimizer",
+    "version": "1.0.0",
+    "description": "AI-powered prompt optimizer using OpenRouter API",
+    "main": "api/optimize.js",
+    "scripts": {
+        "dev": "vercel dev",
+        "deploy": "vercel --prod"
+    },
+    "dependencies": {
+        "node-fetch": "^3.3.2"
+    },
+    "devDependencies": {
+        "vercel": "^33.0.0"
+    },
+    "engines": {
+        "node": ">=18.x"
+    },
+    "keywords": [
+        "prompt",
+        "optimizer",
+        "ai",
+        "openrouter"
+    ],
+    "license": "MIT"
+}
