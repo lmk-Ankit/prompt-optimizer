@@ -159,12 +159,9 @@ export default async function handler(req) {
   // Build the combined system prompt (base + mode suffix)
   const systemMsg = SYSTEM_PROMPT + (MODE_SUFFIX[mode] ?? MODE_SUFFIX.quick);
 
-  // Call OpenRouter — try Mistral first, fall back to LLaMA if quota exceeded
-  // Free-tier models on OpenRouter — ordered by preference
+  // Call OpenRouter
   const MODELS = [
-    "mistralai/mistral-small-3.1-24b-instruct:free",
-    "meta-llama/llama-3.3-70b-instruct:free",
-    "google/gemma-3-12b-it:free",
+    "mistralai/mistral-small-creative",
   ];
 
   let improved = null;

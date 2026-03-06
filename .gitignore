@@ -3,7 +3,7 @@ node_modules/
 
 # Environment variables (never commit real keys)
 .env
-
+.env.example
 # Notebook outputs & checkpoints
 .ipynb_checkpoints/
 results.csv
